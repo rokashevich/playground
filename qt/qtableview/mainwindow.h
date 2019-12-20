@@ -20,7 +20,7 @@ private:
   }
   QVariant data(const QModelIndex &index, int role) const {
     if (role == Qt::DisplayRole) {
-            QString unswer = QString("row = ") + QString::number(index.row()) + "  col = " + QString::number(index.column());
+            QString unswer = QString::number(index.row()) + "," + QString::number(index.column());
             return QVariant(unswer);
         }
         return QVariant();

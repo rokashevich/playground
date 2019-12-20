@@ -1,3 +1,5 @@
+#include <QDebug>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -8,6 +10,10 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
   model_ = new SimpleModel;
   ui->tableView->setModel(model_);
+
+  connect(ui->tableView,&QTableView::clicked,this,[](const QModelIndex &index) {
+    qDebug() << "Клик в клетке" << index.row() << "," << index.column();
+  });
 }
 
 MainWindow::~MainWindow()
