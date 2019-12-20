@@ -14,6 +14,10 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->tableView,&QTableView::clicked,this,[](const QModelIndex &index) {
     qDebug() << "Клик в клетке" << index.row() << "," << index.column();
   });
+
+  connect(ui->tableView,&QTableView::doubleClicked,this,[](const QModelIndex &index) {
+    qDebug() << "Двойной клик в клетке" << index.row() << "," << index.column();
+  });
 }
 
 MainWindow::~MainWindow()
