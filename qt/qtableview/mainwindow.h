@@ -3,11 +3,52 @@
 
 #include <QAbstractTableModel>
 #include <QMainWindow>
+#include <QSpinBox>
+#include <QStyledItemDelegate>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class SpinBoxDelegate : public QStyledItemDelegate
+{
+  Q_OBJECT
+
+public:
+  SpinBoxDelegate(QObject *parent = nullptr){};
+
+  QWidget *createEditor(QWidget *parent,
+                        const QStyleOptionViewItem &/* option */,
+                        const QModelIndex &/* index */) const {
+    QSpinBox *editor = new QSpinBox(parent);
+    editor->setFrame(false);
+    editor->setMinimum(0);
+    editor->setMaximum(100);
+
+    return editor;
+  }
+
+  void setEditorDatasetEditorData(QWidget *editor,
+                                  const QModelIndex &index) const {
+    int value = index.model()->data(index, Qt::EditRole).toInt();
+    QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+    spinBox->setValue(value);
+  }
+  void setModelData(QWidget *editor, QAbstractItemModel *model,
+                    const QModelIndex &index) const {
+    QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+    spinBox->interpretText();
+    int value = spinBox->value();
+
+    model->setData(index, value, Qt::EditRole);
+  }
+
+  void updateEditorGeometry(QWidget *editor,
+                            const QStyleOptionViewItem &option,
+                            const QModelIndex &/* index */) const {
+    editor->setGeometry(option.rect);
+  }
+};
 
 class SimpleModel: public QAbstractTableModel {
   Q_OBJECT
@@ -19,11 +60,11 @@ private:
     return 4;
   }
   QVariant data(const QModelIndex &index, int role) const {
-    if (role == Qt::DisplayRole) {
-            QString unswer = QString::number(index.row()) + "," + QString::number(index.column());
-            return QVariant(unswer);
-        }
-        return QVariant();
+    if (role == Qt::DisplayRole || role == Qt::EditRole) {
+      QString unswer = QString::number(index.row()) + "," + QString::number(index.column());
+      return QVariant(1);
+    }
+    return QVariant();
   }
 };
 
