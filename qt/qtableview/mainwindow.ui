@@ -23,6 +23,15 @@
       <height>511</height>
      </rect>
     </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::CurrentChanged</set>
+    </property>
+    <property name="gridStyle">
+     <enum>Qt::DotLine</enum>
+    </property>
+    <property name="sortingEnabled">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">

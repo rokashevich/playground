@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
 
   SpinBoxDelegate* delegate = new SpinBoxDelegate;
   ui->tableView->setItemDelegate(delegate);
-  ui->tableView->setEditTriggers(QAbstractItemView::DoubleClicked);
 
   connect(ui->tableView,&QTableView::clicked,this,[](const QModelIndex &index) {
     qDebug() << "Клик в клетке" << index.row() << "," << index.column();

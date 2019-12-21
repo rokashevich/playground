@@ -28,7 +28,7 @@ public:
     return editor;
   }
 
-  void setEditorDatasetEditorData(QWidget *editor,
+  void setEditorData(QWidget *editor,
                                   const QModelIndex &index) const {
     int value = index.model()->data(index, Qt::EditRole).toInt();
     QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
@@ -53,6 +53,11 @@ public:
 class SimpleModel: public QAbstractTableModel {
   Q_OBJECT
 private:
+  Qt::ItemFlags flags(const QModelIndex &index) const {
+      Qt::ItemFlags flags = QAbstractTableModel::flags(index);
+      flags |= Qt::ItemIsEditable;
+      return flags;
+  }
   int rowCount(const QModelIndex &parent) const {
     return 4;
   }
@@ -65,6 +70,9 @@ private:
       return QVariant(1);
     }
     return QVariant();
+  }
+  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
+
   }
 };
 
