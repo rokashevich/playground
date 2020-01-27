@@ -71,8 +71,32 @@ private:
     }
     return QVariant();
   }
-  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
-
+  bool setData(const QModelIndex &index, const QVariant &value,
+               int role = Qt::EditRole) override {}
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role) const {
+    if (role != Qt::DisplayRole) return QVariant();
+    if (orientation == Qt::Horizontal) {
+      switch (section) {
+        case 0:
+          return QVariant(QString::fromUtf8("Название"));
+        case 1:
+          return QVariant(QString::fromUtf8("Заводской номер"));
+        case 2:
+          return QVariant(QString::fromUtf8("R2, м"));
+        case 3:
+          return QVariant(QString::fromUtf8("Rкз, м"));
+        case 4:
+          return QVariant(QString::fromUtf8("Предписание"));
+        case 5:
+          return QVariant(QString::fromUtf8("Заключение"));
+        case 6:
+          return QVariant(QString::fromUtf8("Примечание"));
+        default:
+          return QVariant();
+      }
+    }
+    return QVariant();
   }
 };
 
