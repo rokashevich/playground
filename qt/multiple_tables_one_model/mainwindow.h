@@ -56,6 +56,8 @@ class SimpleModel : public QAbstractTableModel {
       table_->clearSelection();
     }
   }
+  void onModeEdit() { table_->setDisabled(true); }
+  void onModeSelect() { table_->setEnabled(true); }
  signals:
   void clearSelection();
 };
@@ -68,19 +70,12 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
  signals:
   void notifyAllSelectionChanged(QItemSelectionModel *m);
+  void modeEdit();
+  void modeSelect();
  public slots:
-  void onAnySelectionChanged(const QItemSelection &selected1,
-                             const QItemSelection &selected2) {
-    Q_UNUSED(selected2)
-
-    // Снятие выделения так же пораждает сигнал selectionChanged, с пустым
-    // кол-вом индексов - эти сигнал игнорируем.
-    if (selected1.indexes().count() == 0) return;
-
-    QItemSelectionModel *m =
-        dynamic_cast<QItemSelectionModel *>(QObject::sender());
-    emit notifyAllSelectionChanged(m);
-  }
+  void onAnySelectionChanged(const QItemSelection &, const QItemSelection &);
+  void onModeEdit();
+  void onModeSelect();
 
  private:
   Ui::MainWindow *ui;
