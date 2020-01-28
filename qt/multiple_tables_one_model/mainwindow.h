@@ -23,16 +23,16 @@ typedef QVector<QStringList> Type3;
 class SimpleModel : public QAbstractTableModel {
   Q_OBJECT
  public:
-  SimpleModel(QTableView *tv) : tv_(tv) {}
+  SimpleModel(QTableView *table) : table_(table) { table->setModel(this); }
   template <typename T>
   void feed(T db) {
     db_ = db;
+    emit layoutChanged();
   }
-  QVector<QStringList> db_;
 
  private:
-  QTableView *tv_;
-
+  QVector<QStringList> db_;
+  QTableView *table_;
   Qt::ItemFlags flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = QAbstractTableModel::flags(index);
     return flags;
@@ -49,11 +49,11 @@ class SimpleModel : public QAbstractTableModel {
   }
 
  public slots:
-  void integral_selection_changed(SimpleModel *m) {
-    if (this != m) {
-      tv_->selectionModel()->clearSelection();
-    } else {
-      // qDebug() << m->db_;
+  void onNotifyAllSelectionChanged(QItemSelectionModel *m) {
+    // Очищаем выделение в таблице только если пришедший сигнал не от тебя
+    // самого.
+    if (this != dynamic_cast<SimpleModel *>(m->model())) {
+      table_->clearSelection();
     }
   }
  signals:
@@ -67,15 +67,19 @@ class MainWindow : public QMainWindow {
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
  signals:
-  void integral_selection_changed(SimpleModel *m);
+  void notifyAllSelectionChanged(QItemSelectionModel *m);
  public slots:
-  void any_selection_changed(const QItemSelection &selected1,
+  void onAnySelectionChanged(const QItemSelection &selected1,
                              const QItemSelection &selected2) {
-    QObject *obj = sender();
-    QItemSelectionModel *m = static_cast<QItemSelectionModel *>(obj);
-    SimpleModel *s = static_cast<SimpleModel *>(m->model());
-    emit integral_selection_changed(s);
-    // qDebug() << "selected row =" << selected1.indexes().at(0).row();
+    Q_UNUSED(selected2)
+
+    // Снятие выделения так же пораждает сигнал selectionChanged, с пустым
+    // кол-вом индексов - эти сигнал игнорируем.
+    if (selected1.indexes().count() == 0) return;
+
+    QItemSelectionModel *m =
+        dynamic_cast<QItemSelectionModel *>(QObject::sender());
+    emit notifyAllSelectionChanged(m);
   }
 
  private:
