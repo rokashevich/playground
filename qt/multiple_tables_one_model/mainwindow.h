@@ -58,8 +58,6 @@ class SimpleModel : public QAbstractTableModel {
   }
   void onModeEdit() { table_->setDisabled(true); }
   void onModeSelect() { table_->setEnabled(true); }
- signals:
-  void clearSelection();
 };
 
 class MainWindow : public QMainWindow {

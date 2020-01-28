@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>801</width>
-    <height>537</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,7 +58,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>edit</string>
+     <string>add</string>
     </property>
    </widget>
    <widget class="QTableView" name="table_2">
@@ -159,7 +159,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>save</string>
+     <string>edit</string>
     </property>
    </widget>
    <widget class="QPushButton" name="button_delete">
