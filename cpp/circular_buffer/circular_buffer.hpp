@@ -18,16 +18,6 @@ struct cb_index_wrapper {
   }
 };
 
-template <class T, bool = ::std::is_trivially_destructible<T>::value>
-union optional_storage {
-  struct empty_t {};
-
-  empty_t _empty;
-  T _value;
-
-  ~optional_storage() {}
-};
-
 template <class S, class TC, std::size_t N>
 class cb_iterator {
   template <class, class, std::size_t>
@@ -50,9 +40,7 @@ class cb_iterator {
                                  std::size_t left_in_forward) noexcept
       : _buf(buf), _pos(pos), _left_in_forward(left_in_forward) {}
 
-  constexpr reference operator*() const noexcept {
-    return (_buf + _pos)->_value;
-  }
+  reference operator*() { return *(_buf + _pos); }
 
   cb_iterator& operator++() noexcept {
     _pos = wrapper_t::increment(_pos);
@@ -80,18 +68,18 @@ class circular_buffer {
   typedef std::ptrdiff_t difference_type;
   typedef T& reference;
   typedef T* pointer;
-  typedef cb_iterator<optional_storage<T>, T, N> iterator;
+  typedef cb_iterator<T, T, N> iterator;
 
  private:
   typedef cb_index_wrapper<size_type, N> wrapper_t;
-  typedef optional_storage<T> storage_type;
+  typedef T storage_type;
 
   size_type _head;
   size_type _tail;
   size_type _size;
   storage_type _buffer[N];
 
-  inline void destroy(size_type idx) noexcept { _buffer[idx]._value.~T(); }
+  inline void destroy(size_type idx) noexcept { _buffer[idx].~T(); }
 
  public:
   constexpr explicit circular_buffer()
@@ -116,10 +104,10 @@ class circular_buffer {
       new_tail = _head;
       _head = wrapper_t::increment(_head);
       --_size;
-      _buffer[new_tail]._value = value;
+      _buffer[new_tail] = value;
     } else {
       new_tail = wrapper_t::increment(_tail);
-      new (::std::addressof(_buffer[new_tail]._value)) T(value);
+      new (::std::addressof(_buffer[new_tail])) T(value);
     }
 
     _tail = new_tail;
