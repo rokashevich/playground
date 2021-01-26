@@ -171,11 +171,13 @@ function _toTop() {
    let monitor = Main.layoutManager.primaryMonitor;  
    PanelBox.set_pivot_point(0,0);
    PanelBox.set_position(0,0);
+   Main.panel.actor.add_style_class_name("popup-menu");
 }
 function _toBottom() {
     let monitor = Main.layoutManager.primaryMonitor;
     PanelBox.set_pivot_point(0,(-1)*(monitor.height-PanelBox.height));
     PanelBox.set_position(0,(monitor.height-PanelBox.height));
+    Main.panel.actor.add_style_class_name("popup-menu");
 }
 
 
