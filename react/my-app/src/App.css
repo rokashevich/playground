@@ -6,23 +6,3 @@
   "h h"
   "n c";
 }
-
-.header{
-  grid-area: h;
-  background-color: aquamarine;
-}
-
-.header img {
-  width: 100px;
-  height: 100px;
-}
-
-.nav{
-  grid-area: n;
-  background-color: burlywood;
-}
-
-.content{
-  grid-area: c;
-  background-color: bisque;
-}
