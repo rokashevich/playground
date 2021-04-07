@@ -1,4 +1,4 @@
-.header{
+.header {
   grid-area: h;
   background-color: aquamarine;
 }
@@ -7,4 +7,3 @@
   width: 100px;
   height: 100px;
 }
-
