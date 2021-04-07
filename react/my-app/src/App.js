@@ -15,8 +15,6 @@ const App = () => {
         <div class='app-wrapper-content'>
           <Route path='/profile' component={Profile} />
           <Route path='/dialogs' component={Dialogs} />
-          {/* <Profile /> */}
-          {/* <Dialogs /> */}
         </div>
       </div>
     </BrowserRouter>
