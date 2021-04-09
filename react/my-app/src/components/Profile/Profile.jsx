@@ -1,20 +1,15 @@
-import React from "react";
-import MyPosts from "./MyPosts/MyPosts";
-import s from "./Profile.module.css";
+import React from 'react'
+import MyPosts from './MyPosts/MyPosts'
+import ProfileInfo from './ProfileInfo/ProfileInfo'
+import s from './Profile.module.css'
 
 const Profile = () => {
   return (
     <div>
-      <div>
-        <img
-          height="100px"
-          src="https://wallpapercave.com/wp/wp2173645.jpg"
-        ></img>
-      </div>
-      <div>ava + desc</div>
+      <ProfileInfo />
       <MyPosts />
     </div>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile
