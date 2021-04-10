@@ -4,10 +4,10 @@ import Message from './Message/Message'
 import s from './Dialogs.module.css'
 
 const Dialogs = props => {
-  let dialogsElements = props.dialogs.map(e => (
+  let dialogsElements = props.state.dialogs.map(e => (
     <DialogItem name={e.name} id={e.id} />
   ))
-  let messagesElements = props.messages.map(e => (
+  let messagesElements = props.state.messages.map(e => (
     <Message message={e.message} />
   ))
   return (
