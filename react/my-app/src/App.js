@@ -15,16 +15,17 @@ const App = props => {
         <div className='app-wrapper-content'>
           <Route
             path='/profile'
-            component={() => (
+            render={() => (
               <Profile
                 state={props.state.profilePage}
                 addPost={props.addPost}
+                updateNewPostText={props.updateNewPostText}
               />
             )}
           />
           <Route
             path='/dialogs'
-            component={() => <Dialogs state={props.state.dialogsPage} />}
+            render={() => <Dialogs state={props.state.dialogsPage} />}
           />
         </div>
       </div>
