@@ -25,10 +25,7 @@ const App = props => {
           <Route
             path='/dialogs'
             render={() => (
-              <Dialogs
-                state={props.state.dialogsPage}
-                dispatch={props.dispatch}
-              />
+              <Dialogs store={props.store} dispatch={props.dispatch} />
             )}
           />
         </div>
