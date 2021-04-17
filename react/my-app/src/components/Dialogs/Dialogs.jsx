@@ -6,10 +6,10 @@ import s from './Dialogs.module.css'
 const Dialogs = props => {
   let state = props.dialogsPage
   let dialogsElements = state.dialogs.map(e => (
-    <DialogItem name={e.name} id={e.id} />
+    <DialogItem name={e.name} key={e.id} id={e.id} />
   ))
   let messagesElements = state.messages.map(e => (
-    <Message message={e.message} />
+    <Message message={e.message} key={e.id} />
   ))
   let messageBody = state.newMessageBody
   let onSendMessageClick = () => {
