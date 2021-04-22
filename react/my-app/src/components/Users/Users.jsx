@@ -11,12 +11,15 @@ let Users = props => {
     <div>
       <div className={s.pagination}>
         {pages.map(p => (
-          <span
-            className={props.currentPage === p ? s.selectedPage : s.page}
-            onClick={() => {
-              props.onPageChanged(p)
-            }}>
-            {p}
+          <span>
+            <span
+              className={props.currentPage === p ? s.selectedPage : s.page}
+              onClick={() => {
+                props.onPageChanged(p)
+              }}>
+              {p}
+            </span>
+            &nbsp;
           </span>
         ))}
       </div>
