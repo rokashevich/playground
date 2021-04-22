@@ -1,6 +1,7 @@
 .header {
   grid-area: h;
   background-color: aquamarine;
+  text-align: right;
 }
 
 .header img {

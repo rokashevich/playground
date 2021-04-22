@@ -1,12 +1,11 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import s from './Header.module.css'
 
-const Header = () => {
+const Header = props => {
   return (
     <header className={s.header}>
-      {/* <img
-        alt='alternative text'
-        src='https://yt3.ggpht.com/ytc/AAUvwnhcOYdTa8LLrCrXBvmGL2kd1pP1xiGLChGUaz4KGA=s48-c-k-c0x00ffffff-no-rj'></img> */}
+      ➤{props.isAuth ? props.login : <NavLink to={'/login'}>Login</NavLink>}
     </header>
   )
 }
