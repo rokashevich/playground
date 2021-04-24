@@ -1,7 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import s from './Users.module.css'
 import userPhoto from '../../assets/images/user.png'
-import { usersAPI } from '../../api/api'
 let Users = props => {
   let pagesCount = Math.ceil(props.totalUsersCount / props.pageSize)
   let pages = []
@@ -11,18 +10,19 @@ let Users = props => {
   return (
     <div>
       <div className={s.pagination}>
-        {pages.map(p => (
-          <span>
-            <span
-              className={props.currentPage === p ? s.selectedPage : s.page}
-              onClick={() => {
-                props.onPageChanged(p)
-              }}>
-              {p}
+        {pages
+          .map(p => (
+            <span className={p % 2 === 0 ? s.even : s.odd} key={p}>
+              <span
+                className={props.currentPage === p ? s.selectedPage : s.page}
+                onClick={() => {
+                  props.onPageChanged(p)
+                }}>
+                {pagesCount - p + 1}
+              </span>
             </span>
-            &nbsp;
-          </span>
-        ))}
+          ))
+          .reverse()}
       </div>
       {props.users.map(u => (
         <div key={u.id}>

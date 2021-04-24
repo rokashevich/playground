@@ -3,18 +3,23 @@
   height: 50px;
 }
 .page {
-  color: black;
+  cursor: pointer;
 }
 .page:hover {
-  background-color: blue;
+  background-color: cyan;
 }
 .selectedPage {
-  background-color: black;
-  color: white;
+  background-color: cyan;
   word-wrap: break-word;
 }
 .pagination {
   font-size: xx-small;
   display: flex;
   flex-wrap: wrap;
+}
+.odd {
+  background-color: darkgray;
+}
+.even {
+  background-color: lightgrey;
 }
