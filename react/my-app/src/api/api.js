@@ -25,6 +25,8 @@ export const usersAPI = {
   }
 }
 
-export const getUsers2 = (currentPage = 1, pageSize = 10) => {
-  return instance.get(`follow?id=`).then(response => response.data)
+export const authAPI = {
+  me() {
+    return instance.get(`auth/me`)
+  }
 }

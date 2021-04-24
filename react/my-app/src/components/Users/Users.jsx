@@ -18,7 +18,7 @@ let Users = props => {
                 onClick={() => {
                   props.onPageChanged(p)
                 }}>
-                {pagesCount - p + 1}
+                {p}
               </span>
             </span>
           ))

@@ -5,7 +5,12 @@ import s from './Header.module.css'
 const Header = props => {
   return (
     <header className={s.header}>
-      ➤{props.isAuth ? props.login : <NavLink to={'/login'}>Login</NavLink>}
+      ➤
+      {props.isAuth ? (
+        `${props.login}(${props.userId})`
+      ) : (
+        <NavLink to={'/login'}>Login</NavLink>
+      )}
     </header>
   )
 }
