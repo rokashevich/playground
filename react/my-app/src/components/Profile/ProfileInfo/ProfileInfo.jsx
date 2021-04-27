@@ -8,22 +8,29 @@ const ProfileInfo = props => {
     return <Preloader />
   }
   return (
-    <div>
-      <div className={s.descriptionBlock}>
-        <img alt='ava' src={props.profile.photos.small} />
+    <div className={s.descriptionBlock}>
+      <div>
         <img alt='ava' src={props.profile.photos.large} />
       </div>
-      <ProfileStatus status={'xxx'} />
-      <div>aboutMe: {props.profile.aboutMe}</div>
-      {Object.entries(props.profile.contacts).map(([key, val]) => (
-        <div title={key}>✉ {val}</div>
-      ))}
-      <div>lookingForAJob: {props.profile.lookingForAJob}</div>
       <div>
-        lookingForAJobDescription: {props.profile.lookingForAJobDescription}
+        <ProfileStatus status={'xxx'} />
       </div>
-      <div>fullName: {props.profile.fullName}</div>
-      <div>userId: {props.profile.userId}</div>
+      <div>aboutMe</div>
+      <div>{props.profile.aboutMe}</div>
+      {Object.entries(props.profile.contacts).map(([key, val]) => (
+        <>
+          <div>{key}</div>
+          <div>{val}</div>
+        </>
+      ))}
+      <div>lookingForAJob</div>
+      <div>{props.profile.lookingForAJob}</div>
+      <div>lookingForAJobDescription</div>
+      <div>{props.profile.lookingForAJobDescription}</div>
+      <div>fullName</div>
+      <div>{props.profile.fullName}</div>
+      <div>userId</div>
+      <div>{props.profile.userId}</div>
     </div>
   )
 }
