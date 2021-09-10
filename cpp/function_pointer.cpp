@@ -12,11 +12,12 @@ struct Functor{
   int operator()(float a, char b){printf("Functor\n"); return a + b; }
 };
 
+using p2f = int(*)(float, char); // == typedef int(*p2f)(float, char);
+
 // Функция, принимающая double и возвращающая функцию
 // принимающую float и char и возвращающую int.
 int (*GetP1(double d))(float, char) {return &DoC;}
 // Альтернативный вариант
-typedef int(*p2f)(float, char);
 p2f GetP2(double d) {return &DoC;}
 // Самый простой вариант!
 auto GetP3(double d) {return &DoC;} 
@@ -25,8 +26,7 @@ int main(){
   int (*pcf)(float, char);
   pcf = DoC;  // short form
   pcf = &DoC; // correct assignment using address operator
-  pcf(1,2);
-  (*pcf)(1,2);
+  
 
   pcf = &TMyClass::DoStatic; // можно переиспользовать pcf
   pcf(1,2);
@@ -41,8 +41,7 @@ int main(){
   GetP3(1.0)(1,2);
 
   // Массив указателей
-  typedef int(*tpcf)(float,char);
-  tpcf pcf_arr[10];
+  p2f pcf_arr[10];
   pcf_arr[0] = &DoC;
   pcf_arr[0](1,2);
 
