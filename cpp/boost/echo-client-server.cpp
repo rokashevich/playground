@@ -11,6 +11,7 @@
 #include <boost/thread.hpp>
 #include <iostream>
 #include <string>
+#include <memory>
 using namespace boost::asio;
 using namespace boost::posix_time;
 using namespace boost::program_options;
@@ -60,7 +61,7 @@ void sync_echo(std::string msg) {
 #define MEM_FN(x) boost::bind(&self_type::x, shared_from_this())
 #define MEM_FN1(x, y) boost::bind(&self_type::x, shared_from_this(), y)
 #define MEM_FN2(x, y, z) boost::bind(&self_type::x, shared_from_this(), y, z)
-class talk_to_client : public boost::enable_shared_from_this<talk_to_client>,
+class talk_to_client : public std::enable_shared_from_this<talk_to_client>,
                        boost::noncopyable {
   typedef talk_to_client self_type;
   talk_to_client() : sock_(service), started_(false) {}
@@ -79,8 +80,8 @@ class talk_to_client : public boost::enable_shared_from_this<talk_to_client>,
     do_read();
   }
 
-  static boost::shared_ptr<talk_to_client> new_() {
-    boost::shared_ptr<talk_to_client> new_(new talk_to_client);
+  static std::shared_ptr<talk_to_client> new_() {
+    std::shared_ptr<talk_to_client> new_(new talk_to_client);
     return new_;
   }
   void stop() {
@@ -128,10 +129,10 @@ class talk_to_client : public boost::enable_shared_from_this<talk_to_client>,
 };
 
 // Приём клентов.
-void handle_accept(boost::shared_ptr<talk_to_client> client,
+void handle_accept(std::shared_ptr<talk_to_client> client,
                    const boost::system::error_code& err) {
   client->start();
-  boost::shared_ptr<talk_to_client> new_client = talk_to_client::new_();
+  std::shared_ptr<talk_to_client> new_client = talk_to_client::new_();
   talk_to_client::acceptor().async_accept(
       new_client->sock(), boost::bind(handle_accept, new_client, _1));
 }
@@ -158,7 +159,7 @@ int main(int argc, char* argv[]) {
     }
     threads.join_all();
   } else if (vm.count("tas")) {
-    boost::shared_ptr<talk_to_client> client = talk_to_client::new_();
+    std::shared_ptr<talk_to_client> client = talk_to_client::new_();
     talk_to_client::acceptor().async_accept(
         client->sock(), boost::bind(handle_accept, client, _1));
     service.run();
