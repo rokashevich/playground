@@ -10,22 +10,24 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <iostream>
-#include <string>
 #include <memory>
+#include <string>
 using namespace boost::asio;
 using namespace boost::posix_time;
 using namespace boost::program_options;
 using boost::system::error_code;
 io_service service;
 
+//=============================================================================
+// TCP SYNC
 size_t read_complete(char* buff, const error_code& err, size_t bytes) {
   if (err) return 0;
   bool found = std::find(buff, buff + bytes, '\n') < buff + bytes;
   // we read one-by-one until we get to enter, no buffering
   return found ? 0 : 1;
 }
-//=============================================================================
-//  TCP SYNC SERVER
+//-----------------------------------------------------------------------------
+// SERVER
 void tss_handle_connections() {
   ip::tcp::acceptor acceptor(service, ip::tcp::endpoint(ip::tcp::v4(), 8001));
   char buff[1024];
@@ -40,8 +42,8 @@ void tss_handle_connections() {
     sock.close();
   }
 }
-//=============================================================================
-// TCP SYNC CLIENT
+//-----------------------------------------------------------------------------
+// CLIENT
 ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
 void sync_echo(std::string msg) {
   msg += "\n";
@@ -159,9 +161,13 @@ int main(int argc, char* argv[]) {
     }
     threads.join_all();
   } else if (vm.count("tas")) {
+    std::cout << "TCP Async Server\n";
     std::shared_ptr<talk_to_client> client = talk_to_client::new_();
+
+    // Заменил лямбдой boost::bind(handle_accept, client, _1)
     talk_to_client::acceptor().async_accept(
-        client->sock(), boost::bind(handle_accept, client, _1));
+        client->sock(), [&](auto& err) { return handle_accept(client, err); });
+
     service.run();
   }
 }
