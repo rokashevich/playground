@@ -23,12 +23,12 @@ p2f GetP2(double d) {return &DoC;}
 auto GetP3(double d) {return &DoC;} 
 
 int main(){
-  int (*pcf)(float, char);
-  pcf = DoC;  // short form
-  pcf = &DoC; // correct assignment using address operator
+  int (*const pcf)(float, char) = DoC;
+  // pcf = DoC;  // short form
+  // pcf = &DoC; // correct assignment using address operator
   
 
-  pcf = &TMyClass::DoStatic; // можно переиспользовать pcf
+  // pcf = &TMyClass::DoStatic; // можно переиспользовать pcf
   pcf(1,2);
 
   int (TMyClass::*imember)(float, char);
