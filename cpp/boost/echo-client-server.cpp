@@ -34,8 +34,9 @@ void tss_handle_connections() {
   while (true) {
     ip::tcp::socket sock(service);
     acceptor.accept(sock);
-    int bytes =
-        read(sock, buffer(buff), boost::bind(read_complete, buff, _1, _2));
+    int bytes = read(sock, buffer(buff), [&](auto& err, auto bytes) {
+      return read_complete(buff, err, bytes);
+    });
     std::string msg(buff, bytes);
     std::cout << "got " << msg;
     sock.write_some(buffer(msg));
@@ -51,7 +52,9 @@ void sync_echo(std::string msg) {
   sock.connect(ep);
   sock.write_some(buffer(msg));
   char buf[1024];
-  int bytes = read(sock, buffer(buf), boost::bind(read_complete, buf, _1, _2));
+  int bytes = read(sock, buffer(buf), [&](auto& err, auto bytes) {
+    return read_complete(buf, err, bytes);
+  });
   std::string copy(buf, bytes - 1);
   msg = msg.substr(0, msg.size() - 1);
   std::cout << "server echoed our " << msg << ": "
@@ -135,8 +138,9 @@ void handle_accept(std::shared_ptr<talk_to_client> client,
                    const boost::system::error_code& err) {
   client->start();
   std::shared_ptr<talk_to_client> new_client = talk_to_client::new_();
-  talk_to_client::acceptor().async_accept(
-      new_client->sock(), boost::bind(handle_accept, new_client, _1));
+  talk_to_client::acceptor().async_accept(new_client->sock(), [=](auto& err) {
+    return handle_accept(new_client, err);
+  });
 }
 
 int main(int argc, char* argv[]) {
@@ -156,7 +160,7 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> messages{"AA", "BB", "CC", "DD"};
     boost::thread_group threads;
     for (auto& message : messages) {
-      threads.create_thread(boost::bind(sync_echo, message));
+      threads.create_thread([=] { return sync_echo(message); });
       boost::this_thread::sleep(boost::posix_time::millisec(100));
     }
     threads.join_all();
@@ -164,9 +168,8 @@ int main(int argc, char* argv[]) {
     std::cout << "TCP Async Server\n";
     std::shared_ptr<talk_to_client> client = talk_to_client::new_();
 
-    // Заменил лямбдой boost::bind(handle_accept, client, _1)
     talk_to_client::acceptor().async_accept(
-        client->sock(), [&](auto& err) { return handle_accept(client, err); });
+        client->sock(), [=](auto& err) { return handle_accept(client, err); });
 
     service.run();
   }
