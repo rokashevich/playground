@@ -5,7 +5,7 @@
 // clang-format on
 
 #include <boost/asio.hpp>
-#include <boost/thread.hpp>
+#include <boost/process.hpp>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -13,28 +13,30 @@
 using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
+// using namespace boost::process;
 
 class session {
   asio::streambuf buff;
 
  public:
-  static void serve(std::shared_ptr<session> pThis) {
+  static void serve(std::shared_ptr<session> pThis, io_service& ios) {
     std::cout << "async_read_until(sock, buff, read_callback) // register "
                  "read_callback\n";
     // GET запрос имеет вид "GET /script.sh HTTP/1.1\r\n"
     asio::async_read_until(
         pThis->socket, pThis->buff, '\r',
-        [pThis](const error_code& e, std::size_t s) {
+        [pThis, &ios](const error_code& e, std::size_t s) {
           std::cout << "\read_callback begin\n";
           std::string line;
           std::istream stream{&pThis->buff};
           std::getline(stream, line, '\r');
-          // ИМИТАЦИЯ ДОЛГОЙ РАБОТЫ СКРИПТА - СПИМ 10 СЕКУНД
-          std::cout << "sleep begin " << boost::this_thread::get_id()
-                    << std::endl;
-          std::this_thread::sleep_for(std::chrono::seconds(10));
-          std::cout << "sleep end " << boost::this_thread::get_id()
-                    << std::endl;
+          // ВЫПОЛНЕНИЕ СКРИПТА
+          process::async_system(
+              ios,
+              [](boost::system::error_code err, int rc) {
+                std::cout << "FINISHED\n";
+              },
+              "sleep 10");
           // ТУТ НАДО СФОРМИРОВАТЬ ПРАВИЛЬНЫЙ ЗАГОЛОВОК И ЗАПИСАТЬ В СОКЕТ
           std::string text{
               "HTTP/1.1 200 OK\r\ncontent-type: text/html\r\ncontent-length: "
@@ -46,7 +48,7 @@ class session {
         });
   }
   ip::tcp::socket socket;
-  session(io_service& io_service) : socket(io_service) {}
+  session(io_service& ios) : socket(ios) {}
 };
 
 void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service) {
@@ -58,7 +60,7 @@ void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service) {
     std::cout << "\naccept_callback begin\n";
     accept_and_run(acceptor, io_service);
     if (!accept_error) {
-      session::serve(sesh);
+      session::serve(sesh, io_service);
     }
     std::cout << "accept_callback end\n\n";
   });
@@ -70,18 +72,18 @@ int main(int argc, const char* argv[]) {
   const std::string script{"script.sh"};
 
   // Стандартная процедура запуска асинхронновго сервера на Boost.Asio.
-  io_service io_service;
+  io_service ios;
   ip::tcp::endpoint endpoint{ip::tcp::v4(), port};
-  ip::tcp::acceptor acceptor{io_service, endpoint};
+  ip::tcp::acceptor acceptor{ios, endpoint};
 
   std::cout << "acceptor.listen()\n";
   acceptor.listen();
 
-  std::cout << "accept_and_run(acceptor, io_service)\n";
-  accept_and_run(acceptor, io_service);
+  std::cout << "accept_and_run(acceptor, ios)\n";
+  accept_and_run(acceptor, ios);
 
-  std::cout << "io_service.run()\n";
-  io_service.run();
+  std::cout << "ios.run()\n";
+  ios.run();
 
   return 0;
 }
