@@ -153,10 +153,14 @@ int main(int argc, char* argv[]) {
   notify(vm);
 
   if (vm.count("tss")) {
-    std::cout << "TCP Sync Server\n";
+    std::cout << "╔═════════════════════╗\n";
+    std::cout << "║TCP Sync Server (tss)║\n";
+    std::cout << "╚═════════════════════╝\n";
     tss_handle_connections();
   } else if (vm.count("tsc")) {
-    std::cout << "TCP Sync Client\n";
+    std::cout << "╔═════════════════════╗\n";
+    std::cout << "║TCP Sync Client (tsc)║\n";
+    std::cout << "╚═════════════════════╝\n";
     std::vector<std::string> messages{"AA", "BB", "CC", "DD"};
     boost::thread_group threads;
     for (auto& message : messages) {
@@ -165,7 +169,9 @@ int main(int argc, char* argv[]) {
     }
     threads.join_all();
   } else if (vm.count("tas")) {
-    std::cout << "TCP Async Server\n";
+    std::cout << "╔══════════════════════╗\n";
+    std::cout << "║TCP Async Server (tas)║\n";
+    std::cout << "╚══════════════════════╝\n";
     std::shared_ptr<talk_to_client> client = talk_to_client::new_();
 
     talk_to_client::acceptor().async_accept(
