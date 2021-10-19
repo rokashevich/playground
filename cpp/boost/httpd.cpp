@@ -1,11 +1,14 @@
 // clang-format off
 // g++ echo-client-server.cpp -lpthread -lboost_system -lboost_thread -lboost_program_options
-// g++ httpd.cpp -lpthread -lboost_system -o httpd
+// g++ httpd.cpp -lpthread -lboost_system -o httpd && ./httpd
 // https://www.codeproject.com/articles/1007262/a-minimal-http-web-server-using-boost-asio
 // clang-format on
 
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 using namespace boost;
 using namespace boost::system;
@@ -15,7 +18,7 @@ class session {
   asio::streambuf buff;
 
  public:
-  static void read_first_line(std::shared_ptr<session> pThis) {
+  static void serve(std::shared_ptr<session> pThis) {
     std::cout << "async_read_until(sock, buff, read_callback) // register "
                  "read_callback\n";
     // GET запрос имеет вид "GET /script.sh HTTP/1.1\r\n"
@@ -26,9 +29,18 @@ class session {
           std::string line;
           std::istream stream{&pThis->buff};
           std::getline(stream, line, '\r');
+          // ИМИТАЦИЯ ДОЛГОЙ РАБОТЫ СКРИПТА - СПИМ 10 СЕКУНД
+          std::cout << "sleep begin " << boost::this_thread::get_id()
+                    << std::endl;
+          std::this_thread::sleep_for(std::chrono::seconds(10));
+          std::cout << "sleep end " << boost::this_thread::get_id()
+                    << std::endl;
           // ТУТ НАДО СФОРМИРОВАТЬ ПРАВИЛЬНЫЙ ЗАГОЛОВОК И ЗАПИСАТЬ В СОКЕТ
+          std::string text{
+              "HTTP/1.1 200 OK\r\ncontent-type: text/html\r\ncontent-length: "
+              "3\r\n\r\n200"};
           asio::async_write(pThis->socket,
-                            boost::asio::buffer(line.c_str(), line.length()),
+                            boost::asio::buffer(text.c_str(), text.length()),
                             [](const error_code& e, std::size_t s) {});
           std::cout << "\read_callback end\n";
         });
@@ -46,7 +58,7 @@ void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service) {
     std::cout << "\naccept_callback begin\n";
     accept_and_run(acceptor, io_service);
     if (!accept_error) {
-      session::read_first_line(sesh);
+      session::serve(sesh);
     }
     std::cout << "accept_callback end\n\n";
   });
