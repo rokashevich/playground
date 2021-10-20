@@ -21,6 +21,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <vector>
 
 using namespace boost;
 using namespace boost::system;
@@ -43,25 +44,38 @@ class session {
           std::istream stream{&pThis->buff};
           std::getline(stream, line, '\r');
           // ВЫПОЛНЕНИЕ СКРИПТА
-          process::async_system(
-              ios,
-              [](boost::system::error_code err, int rc) {
-                std::cout << "FINISHED\n";
-              },
-              "sleep 10");
-          // ТУТ НАДО СФОРМИРОВАТЬ ПРАВИЛЬНЫЙ ЗАГОЛОВОК И ЗАПИСАТЬ В СОКЕТ
-          std::string text{
-              "HTTP/1.1 200 OK\r\ncontent-type: text/html\r\ncontent-length: "
-              "3\r\n\r\n200"};
-          asio::async_write(pThis->socket,
-                            boost::asio::buffer(text.c_str(), text.length()),
-                            [](const error_code& e, std::size_t s) {});
+          if (session::sessions.empty()) {  // скрипт не выполняется
+            std::cout << "START" << std::endl;
+            process::async_system(
+                ios,
+                [](boost::system::error_code err, int rc) {
+                  std::cout << "FINISHED ==" << session::sessions.size()
+                            << std::endl;
+                  for (auto sesh : session::sessions) {
+                    // ТУТ НАДО СФОРМИРОВАТЬ ПРАВИЛЬНЫЙ ЗАГОЛОВОК И ЗАПИСАТЬ В
+                    // СОКЕТ
+                    std::string text{
+                        "HTTP/1.1 200 OK\r\ncontent-type: "
+                        "text/html\r\ncontent-length: "
+                        "3\r\n\r\n200"};
+                    asio::async_write(
+                        sesh->socket,
+                        boost::asio::buffer(text.c_str(), text.length()),
+                        [](const error_code& e, std::size_t s) {});
+                  }
+                  session::sessions.clear();
+                },
+                "sleep 10");
+          }
+          session::sessions.push_back(pThis);
           std::cout << "\read_callback end\n";
         });
   }
+  static std::vector<std::shared_ptr<session>> sessions;
   ip::tcp::socket socket;
   session(io_service& ios) : socket(ios) {}
 };
+std::vector<std::shared_ptr<session>> session::sessions = {};
 
 void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service) {
   std::shared_ptr<session> sesh = std::make_shared<session>(io_service);
