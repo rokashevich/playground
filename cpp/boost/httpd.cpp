@@ -33,24 +33,38 @@ class session {
 
  public:
   static void serve(std::shared_ptr<session> pThis, io_service& ios) {
-    std::cout << "async_read_until(sock, buff, read_callback) // register "
-                 "read_callback\n";
-    // GET запрос имеет вид "GET /script.sh HTTP/1.1\r\n"
+    // К нам в сокет приходит GET запрос который по спецификации имеет следующий
+    // вид: "GET /script.sh HTTP/1.1\r\n" Т.е. когда в бразуере пишешь
+    // 127.0.0.1:8080/script.sh то отправляется запрос именно такого вида.
+    // И непосредственно создание асинхронной задачи, функция serve по сути
+    // обёртка что бы не утяжелять функцию accept_and_run.
     asio::async_read_until(
-        pThis->socket, pThis->buff, '\r',
+        pThis->socket, pThis->buff, '\r',  // читаем данные сокет до первого \r
         [pThis, &ios](const error_code& e, std::size_t s) {
-          std::cout << "\read_callback begin\n";
-          std::string line;
-          std::istream stream{&pThis->buff};
-          std::getline(stream, line, '\r');
-          // ВЫПОЛНЕНИЕ СКРИПТА
-          if (session::sessions.empty()) {  // скрипт не выполняется
-            std::cout << "START" << std::endl;
+          // Внутри callback-а, который вызывается, когда boost.asio считал GET
+          // запрос до символа \r (то что дальше нам и не надо).
+
+          std::istream stream{&pThis->buff};  //байты которые считались
+          std::string line;  // выделим сюда подстроку название скрипта
+
+          // Логика запуска скрипта.
+          // Исходное состояние: скрипт не запущен, количество подключенных
+          // сессий ноль. Как только появляется первый коннект (одновременно
+          // двух не может быть т.к. асинхронщина это не многопоточность, а один
+          // поток!) - запускаем скрипт (асинхронную задачу с колбэком) и в
+          // любом случае добавляем идентификатор обрабатываемой сессии в
+          // статический массив sessions. По завершении скрипта выполняется
+          // callback который в каждую сохранённую сессию пишет код возврата 200
+          // ОК, что скрипт завершился, и обнуляем массив сессий - состояние
+          // приводится к исходному.
+          if (session::sessions.empty()) {
+            std::cout << "START SCRIPT" << std::endl;
             process::async_system(
                 ios,
                 [](boost::system::error_code err, int rc) {
-                  std::cout << "FINISHED ==" << session::sessions.size()
-                            << std::endl;
+                  std::cout
+                      << "FINISH SCRIPT sessions = " << session::sessions.size()
+                      << std::endl;
                   for (auto sesh : session::sessions) {
                     // ТУТ НАДО СФОРМИРОВАТЬ ПРАВИЛЬНЫЙ ЗАГОЛОВОК И ЗАПИСАТЬ В
                     // СОКЕТ
@@ -68,7 +82,6 @@ class session {
                 "sleep 10");
           }
           session::sessions.push_back(pThis);
-          std::cout << "\read_callback end\n";
         });
   }
   static std::vector<std::shared_ptr<session>> sessions;
@@ -78,17 +91,25 @@ class session {
 std::vector<std::shared_ptr<session>> session::sessions = {};
 
 void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service) {
+  // Заводим сессию для ещё неподключенного соединения.
   std::shared_ptr<session> sesh = std::make_shared<session>(io_service);
-  std::cout
-      << "acceptor.async_accept(sock, accept_callback) // register callback\n";
+
+  // Непосредственно задача для воркера - принять соединение и выполнить
+  // callback, данная функция неблокирующая, сразу же выходит. При первом
+  // запуске внутри main() управление передаётся ios.run(), в последующих
+  // случаях просто завершается callback и уже запущенный ios.run смотрит, есть
+  // ли ещё задачи.
   acceptor.async_accept(sesh->socket, [sesh, &acceptor, &io_service](
                                           const error_code& accept_error) {
-    std::cout << "\naccept_callback begin\n";
+    // Внутри callback, значит какое-то соединение принято, и по завершению
+    // callback-а у воркера не останется задач и он завершит свою работу.
+    // Поэтому подсовыываем воркеру повторную задачу ожидать следующее
+    // соединение. Когда оно примется - еще следующее. И т.д.
     accept_and_run(acceptor, io_service);
-    if (!accept_error) {
-      session::serve(sesh, io_service);
-    }
-    std::cout << "accept_callback end\n\n";
+
+    // Если соединение успешно принято - кидаем в пул воркера еще одну
+    // асинхронную задачу по чтению запроса, который пришёл к нам в сокет.
+    if (!accept_error) session::serve(sesh, io_service);
   });
 }
 
@@ -101,15 +122,9 @@ int main(int argc, const char* argv[]) {
   io_service ios;
   ip::tcp::endpoint endpoint{ip::tcp::v4(), port};
   ip::tcp::acceptor acceptor{ios, endpoint};
-
-  std::cout << "acceptor.listen()\n";
-  acceptor.listen();
-
-  std::cout << "accept_and_run(acceptor, ios)\n";
-  accept_and_run(acceptor, ios);
-
-  std::cout << "ios.run()\n";
-  ios.run();
+  acceptor.listen();  //переводим сокет в режим прослушивания
+  accept_and_run(acceptor, ios);  //добавляем первую задачу воркеру
+  ios.run();                      //запускаем воркер
 
   return 0;
 }
