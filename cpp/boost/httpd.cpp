@@ -1,6 +1,18 @@
 // clang-format off
-// g++ echo-client-server.cpp -lpthread -lboost_system -lboost_thread -lboost_program_options
-// g++ httpd.cpp -lpthread -lboost_system -o httpd && ./httpd
+//
+// BOOST
+// https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2
+// mkdir boost && cd boost
+// wget http*boost_VERSION*.tar.bz2
+// tar -xvf boost_VERSION*.tar.bz2
+// cd boost_VERSION
+// ./bootstrap.sh --with-libraries=system,program_options
+// ./b2 --stagedir=. link=static runtime-link=static
+// INCLUDE: boost_VERSION
+// LIB: boost_VERSION/lib
+//
+// PROJECT
+// g++ httpd.cpp -Iboost -lpthread -Lboost/lib -lboost_system -o httpd
 // https://www.codeproject.com/articles/1007262/a-minimal-http-web-server-using-boost-asio
 // clang-format on
 
