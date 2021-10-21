@@ -120,7 +120,6 @@ void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service) {
 int main(int argc, const char* argv[]) {
   // Вынести в ключи через boost_program_options
   const int port{8080};
-  const std::string script{"script.sh"};
 
   // Стандартная процедура запуска асинхронновго сервера на Boost.Asio.
   io_service ios;
