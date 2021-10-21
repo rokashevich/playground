@@ -18,9 +18,10 @@
 
 #include <boost/asio.hpp>
 #include <boost/process.hpp>
+#include <boost/process/async.hpp>
+#include <chrono>
 #include <iostream>
 #include <thread>
-#include <chrono>
 #include <vector>
 
 using namespace boost;
@@ -58,32 +59,35 @@ class session {
           // ОК, что скрипт завершился, и обнуляем массив сессий - состояние
           // приводится к исходному.
           if (session::sessions.empty()) {
-            std::cout << "START SCRIPT" << std::endl;
-            process::async_system(
-                ios,
-                [](boost::system::error_code err, int rc) {
-                  std::cout
-                      << "FINISH SCRIPT sessions = " << session::sessions.size()
-                      << std::endl;
+            pThis->c = boost::process::child(
+                std::vector<std::string>{"/bin/sh", "/tmp/a"},
+                boost::process::std_in = boost::process::null,
+                boost::process::std_out = boost::process::null,
+                boost::process::std_err = boost::process::null, ios,
+                boost::process::on_exit([](int e, const std::error_code& ec) {
+                  // Внутри callback после завершения процесса. Вывод скрипта
+                  // игнорируем, e - код возврата.
+                  // Итерируемся по всем сессиям, которые подключились в
+                  // процессе выполнения скрипта и каждому отправляем заголовок
+                  // о завершении.
+                  const std::string text{
+                      "HTTP/1.1 200 OK\r\ncontent-type: "
+                      "text/html\r\ncontent-length: "
+                      "3\r\n\r\n200"};
                   for (auto sesh : session::sessions) {
-                    // ТУТ НАДО СФОРМИРОВАТЬ ПРАВИЛЬНЫЙ ЗАГОЛОВОК И ЗАПИСАТЬ В
-                    // СОКЕТ
-                    std::string text{
-                        "HTTP/1.1 200 OK\r\ncontent-type: "
-                        "text/html\r\ncontent-length: "
-                        "3\r\n\r\n200"};
                     asio::async_write(
                         sesh->socket,
                         boost::asio::buffer(text.c_str(), text.length()),
                         [](const error_code& e, std::size_t s) {});
                   }
+                  // Очищаем сессии.
                   session::sessions.clear();
-                },
-                "sleep 10");
+                }));
           }
           session::sessions.push_back(pThis);
         });
   }
+  boost::process::child c;
   static std::vector<std::shared_ptr<session>> sessions;
   ip::tcp::socket socket;
   session(io_service& ios) : socket(ios) {}
@@ -97,8 +101,8 @@ void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service) {
   // Непосредственно задача для воркера - принять соединение и выполнить
   // callback, данная функция неблокирующая, сразу же выходит. При первом
   // запуске внутри main() управление передаётся ios.run(), в последующих
-  // случаях просто завершается callback и уже запущенный ios.run смотрит, есть
-  // ли ещё задачи.
+  // случаях просто завершается callback и уже запущенный ios.run смотрит,
+  // есть ли ещё задачи.
   acceptor.async_accept(sesh->socket, [sesh, &acceptor, &io_service](
                                           const error_code& accept_error) {
     // Внутри callback, значит какое-то соединение принято, и по завершению
