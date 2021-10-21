@@ -12,7 +12,7 @@
 // LIB: boost_VERSION/lib
 //
 // PROJECT
-// g++ httpd.cpp -Iboost -lpthread -Lboost/lib -lboost_system -o httpd
+// g++ httpd.cpp -pedantic -Iboost -lpthread -Lboost/lib -lboost_system -o httpd
 // https://www.codeproject.com/articles/1007262/a-minimal-http-web-server-using-boost-asio
 // clang-format on
 
@@ -23,6 +23,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <regex>
 
 using namespace boost;
 using namespace boost::system;
@@ -35,7 +36,7 @@ class session {
  public:
   static void serve(std::shared_ptr<session> pThis, io_service& ios) {
     // К нам в сокет приходит GET запрос который по спецификации имеет следующий
-    // вид: "GET /script.sh HTTP/1.1\r\n" Т.е. когда в бразуере пишешь
+    // вид: "GET /script.sh HTTP/1.1\r\n ..." Т.е. когда в бразуере пишешь
     // 127.0.0.1:8080/script.sh то отправляется запрос именно такого вида.
     // И непосредственно создание асинхронной задачи, функция serve по сути
     // обёртка что бы не утяжелять функцию accept_and_run.
@@ -45,8 +46,17 @@ class session {
           // Внутри callback-а, который вызывается, когда boost.asio считал GET
           // запрос до символа \r (то что дальше нам и не надо).
 
+          // Находим в подстроке запроса название endpoint_name.
           std::istream stream{&pThis->buff};  //байты которые считались
-          std::string line;  // выделим сюда подстроку название скрипта
+          std::string request;  // выделим сюда подстроку название скрипта
+          std::getline(stream, request,
+                       '\r');  // request = GET /script.sh HTTP/1.1
+          std::smatch match;
+          if (!std::regex_search(request, match, std::regex(R"(GET /(.*) )"))) {
+            std::cout << "bad request: " << request << std::endl;
+            return;
+          }
+          const std::string endpoint_name{match.str(1)};
 
           // Логика запуска скрипта.
           // Исходное состояние: скрипт не запущен, количество подключенных
