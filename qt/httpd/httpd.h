@@ -16,10 +16,9 @@ class Httpd : public QObject {
     server = new QTcpServer(this);
     connect(server, SIGNAL(newConnection()), this, SLOT(myConnection()));
     if (!server->listen(QHostAddress::Any, 8080))
-      std::cout << "Web server      could not start" << std::endl;
+      std::cout << "Can not start!" << std::endl;
     else
-      std::cout << "Web server is waiting for a connection on port 8080"
-                << std::endl;
+      std::cout << "Started on port 8080" << std::endl;
   }
   ~Httpd() { socket->close(); }
   QTcpSocket *socket;
@@ -34,7 +33,7 @@ class Httpd : public QObject {
     for (int i = 0; i < sv; i++) std::cout << webBrowerRXData[i];
     std::cout << std::endl;
 
-    QString content = "{\"seconds\":111,\"branch\":{\"a\":1,\"b\":2}}";
+    QString content = "{\"EXAMPLE\":111,\"JSON\":{\"a\":1,\"b\":2}}";
 
     socket->write("HTTP/1.1 200 OK\r\n");
     socket->write("Content-Type: application/json\r\n");

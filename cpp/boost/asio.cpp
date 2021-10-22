@@ -11,8 +11,8 @@ using namespace boost::asio;
 // dispatched 2
 // io_service service;
 // void dispatched_func_1() { std::cout << "dispatched 1" << std::endl; }
-// void dispatched_func_2() { std::cout << "dispatched 2" << std::endl; }
-// void test(boost::function<void()> func) {
+// void dispatched_func_2() { std::cout << "dispatparametric polymorphismched 2"
+// << std::endl; } void test(boost::function<void()> func) {
 //   std::cout << "test" << std::endl;
 //   service.dispatch(dispatched_func_1);
 //   func();

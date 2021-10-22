@@ -172,11 +172,10 @@ int main(int argc, char* argv[]) {
     std::cout << "╔══════════════════════╗\n";
     std::cout << "║TCP Async Server (tas)║\n";
     std::cout << "╚══════════════════════╝\n";
-    std::shared_ptr<talk_to_client> client = talk_to_client::new_();
 
+    std::shared_ptr<talk_to_client> client = talk_to_client::new_();
     talk_to_client::acceptor().async_accept(
         client->sock(), [=](auto& err) { return handle_accept(client, err); });
-
     service.run();
   }
 }
