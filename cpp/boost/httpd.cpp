@@ -133,7 +133,8 @@ int main(int argc, const char* argv[]) {
 
   // Стандартная процедура запуска асинхронновго сервера на Boost.Asio.
   io_service ios;
-  ip::tcp::endpoint endpoint{ip::tcp::v4(), port};
+  ip::tcp::endpoint endpoint{ip::make_address("127.0.0.1"),
+                             port};  // ip::tcp::v4() на все интерфейсы
   ip::tcp::acceptor acceptor{ios, endpoint};
   acceptor.listen();  //переводим сокет в режим прослушивания
   accept_and_run(acceptor, ios);  //добавляем первую задачу воркеру
