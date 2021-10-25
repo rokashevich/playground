@@ -9,7 +9,8 @@ int main(int argc, const char** argv) {
   // в паре с ней можно задать "короткую" опцию -s.
   po::options_description desc("Options:");
   desc.add_options()("help", "Show this help.")(
-      "string-option,s", po::value<std::string>(), "String value.");
+      "string-option,s", po::value<std::string>()->default_value("1234"),
+      "String value.");
 
   // Дальше буст парсит опции использую argc и argv и выводит
   // help в случае если ни одна опция не задана, задана сама
