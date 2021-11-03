@@ -9,12 +9,6 @@
 #include <queue>
 #include <condition_variable>
 class ThreadPool{
-  class Worker{
-    ThreadPool& tp_;
-  public:
-    Worker(ThreadPool& tp);
-    void operator()();
-  };
   std::vector<std::thread> workers_;
   std::mutex m_;
   std::condition_variable cond_;
@@ -27,7 +21,9 @@ public:
 
 ThreadPool::ThreadPool(int threads){
   workers_.reserve(threads);
-  for (auto i=0;i<threads;++i) workers_.emplace_back(Worker(*this));
+  for (auto i=0;i<threads;++i) workers_.emplace_back([](){
+    
+  });
 }
 
 ThreadPool::~ThreadPool(){
@@ -38,23 +34,6 @@ void ThreadPool::AddTask(std::function<void()> lambda) {
   {
     std::unique_lock<std::mutex> l{m_};
     tasks_.emplace(lambda);
-  }
-}
-
-ThreadPool::Worker::Worker(ThreadPool& tp):tp_{tp} {}
-
-void ThreadPool::Worker::operator()(){
-  std::cout << "Worker started operator()()\n";
-  for(;;){
-    std::function<void()> task; // void() может хранить лямбду
-    {
-      std::unique_lock<std::mutex> l{tp_.m_};
-      if (!tp_.tasks_.empty()){//DEL
-        task = tp_.tasks_.front(); // std::move?
-        tp_.tasks_.pop();
-      }//DEL
-    }
-    if (task) task(); //CHANGE
   }
 }
 
