@@ -21,9 +21,9 @@
 #include <boost/process/async.hpp>
 #include <chrono>
 #include <iostream>
+#include <regex>
 #include <thread>
 #include <vector>
-#include <regex>
 
 using namespace boost;
 using namespace boost::system;
@@ -76,7 +76,7 @@ class session {
           // приводится к исходному.
           if (session::sessions.empty()) {
             pThis->c = boost::process::child(
-                std::vector<std::string>{"/bin/sh", "/tmp/a"},
+                std::vector<std::string>{"/bin/sh", "-c", "sleep 0"},
                 boost::process::std_in = boost::process::null,
                 boost::process::std_out = boost::process::null,
                 boost::process::std_err = boost::process::null, ios,
@@ -101,6 +101,15 @@ class session {
                 }));
           }
           session::sessions.push_back(pThis);
+
+          ios.post([&ios]() {
+            std::thread{[&ios] {
+              std::cout << "XXXXXXXX" << std::endl;
+              std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+              std::cout << "YYYYYYYY" << std::endl;
+              ios.post([&ios] { std::cout << "FINISHED\n"; });
+            }}.detach();
+          });
         });
   }
   boost::process::child c;
@@ -134,6 +143,7 @@ void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service) {
 }
 
 int main(int argc, const char* argv[]) {
+  std::cout << "start\n";
   // Вынести в ключи через boost_program_options
   const int port{8080};
 
