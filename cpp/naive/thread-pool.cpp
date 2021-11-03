@@ -11,7 +11,7 @@
 class ThreadPool{
   std::vector<std::thread> workers_;
   std::mutex m_;
-  std::condition_variable cond_;
+  std::condition_variable cv_;
   std::queue<std::function<void()>> tasks_;
 public:
   ThreadPool(int threads);
@@ -21,8 +21,18 @@ public:
 
 ThreadPool::ThreadPool(int threads){
   workers_.reserve(threads);
-  for (auto i=0;i<threads;++i) workers_.emplace_back([](){
-    
+  for (auto i=0;i<threads;++i) workers_.emplace_back([this](){
+    for(;;){
+      std::function<void()> task; // void() может хранить лямбду
+      {
+        std::unique_lock<std::mutex> l{m_};
+        cv_.wait(l, [this](){return !tasks_.empty();});
+        task = tasks_.front(); // std::move?
+        tasks_.pop();
+      }
+      task();
+      cv_.notify_one();
+    }
   });
 }
 
@@ -31,22 +41,21 @@ ThreadPool::~ThreadPool(){
 }
 
 void ThreadPool::AddTask(std::function<void()> lambda) {
-  {
-    std::unique_lock<std::mutex> l{m_};
-    tasks_.emplace(lambda);
-  }
+  std::unique_lock<std::mutex> l{m_};
+  tasks_.emplace(lambda);
+  cv_.notify_one();
 }
 
 int main(){
   ThreadPool tp{5};
-  for (int i=0;i<10;++i){
+  for (int i=0;i<20;++i){
     tp.AddTask([i](){
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
       std::cout << i << std::flush;});
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   std::cout << "\nnew portion\n";
-  for (int i=0;i<10;++i){
+  for (int i=0;i<100;++i){
     tp.AddTask([i](){
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
       std::cout << i << std::flush;});
