@@ -1,9 +1,21 @@
 // clang-format off
 #include <iostream>
+#include <vector>
+#include <functional>
 
 void f(int *&) {}
 
+auto f2(double b){
+  return b*b;
+}
+
 int main() {
+  std::vector<std::function<double(double)>> functs{&f2,&f2,&f2};
+  std::vector<double(*)(double)> functs2{&f2,&f2,&f2};
+  std::cout << typeid(std::function<double(double)>).name() << '\n';
+  std::cout << typeid(double(*)(double)).name() << '\n';
+
+  if (0) {
   // int** array { new int[3][5] }; //нельзя!
 
   int (*array1)[5] { new int[2][5] };// эквиваленты, приоритет [] > *
@@ -24,7 +36,7 @@ int main() {
   for (int count = 0; count < 10; ++count)
     array10xRANDOM[count] = new int[count+1]; // these are our columns
 
-  if (0) {
+  
     int i = 0;
     int j = 0;
     std::cout << ++i + ++j << '\n';  //=2|Приоритеты: ++x,--x=3;
