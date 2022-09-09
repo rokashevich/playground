@@ -1,0 +1,16 @@
+---
+# install: ansible-galaxy collection install community.general
+# https://docs.ansible.com/ansible/latest/collections/community/general/apk_module.html
+- ansible.builtin.gather_facts:
+- community.general.apk:
+    name: nginx
+    update_cache: yes
+- ansible.builtin.template:
+    src: cfg.j2
+    dest: /etc/nginx/nginx.conf
+- ansible.builtin.template:
+    src: index.j2
+    dest: /www/index.html
+- ansible.builtin.service:
+    name: nginx
+    state: reloaded

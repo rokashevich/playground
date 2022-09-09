@@ -1,0 +1,7 @@
+---
+- community.general.apk:
+    name: nginx
+    update_cache: yes
+- ansible.builtin.service:
+    name: nginx
+    state: reloaded

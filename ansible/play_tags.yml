@@ -1,0 +1,22 @@
+---
+- name: example tags
+  hosts: lenovo
+  #hosts: 192.168.1.110
+
+  tasks:
+    - name: "1"
+      ansible.builtin.shell: |
+        echo 1
+      tags:
+        - one
+    - name: "2"
+      ansible.builtin.shell: |
+        echo 2
+      tags:
+        - two
+        - twotwo
+    - name: "3"
+      ansible.builtin.shell: |
+        echo 3
+      tags:
+        - three

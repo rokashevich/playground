@@ -1,0 +1,49 @@
+---
+- name: Install python
+
+  hosts: all
+
+  vars:
+    ansible_user: root
+
+  gather_facts: false # по умолчанию и так true
+
+  roles:
+    - { role: upgrade, tags: upgrade }
+    - { role: enable_nginx, tags: enable_nginx }
+    - { role: www_info, tags: www_info }
+    - { role: disable_nginx, tags: disable_nginx }
+
+  #tasks:
+    #- block:
+    #  - file: >
+    #      path=/etc/ansible/facts.d
+    #      state=directory
+    #  - ansible.builtin.copy:
+    #      content: |
+    #        [A]
+    #        a=1
+    #        b=2
+    #        c=3
+    #      dest: /etc/ansible/facts.d/a.fact
+    #  - ansible.builtin.copy:
+    #      content: '{"B":{"a":1,"b":2,"c":3}}'
+    #      dest: /etc/ansible/facts.d/b.fact
+    #  - ansible.builtin.copy:
+    #      content: |
+    #        #!/bin/sh
+    #        echo '{"C":{"a":1,"b":2,"c":3}}'
+    #      dest: /etc/ansible/facts.d/c.fact
+    #      mode: '777'
+    #  tags: create_ansible_local_fact
+    #- ansible.builtin.set_fact
+    #    need_proxy: "{{ not not inventory_hostname|regex_search('^192\\.168\\.56\\..*')}}"
+    #- debug: var=need_proxy
+    #- ansible.builtin.raw:
+    #    # для локальной машины через прокси
+    #    # out/bin/tinyproxy -dc out/etc/tinyproxy/tinyproxy.conf
+    #    http_proxy=http://192.168.56.1:8888 /sbin/apk add --update --no-cache python3
+    #  when: need_proxy
+    #- debug:
+    #    msg: "None"
+    #  when: need_proxy is none
