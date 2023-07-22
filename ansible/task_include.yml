@@ -1,0 +1,7 @@
+---
+- ansible.builtin.shell: |
+    /bin/touch /tmp/{{arg1}}
+  register: hostname
+  notify:
+    - do on notify 1
+    - do on notify 2

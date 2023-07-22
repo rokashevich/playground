@@ -1,0 +1,10 @@
+.descriptionBlock {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.descriptionBlock > div:nth-child(4n),
+.descriptionBlock > div:nth-child(4n - 1) {
+  /* https://css-tricks.com/almanac/properties/b/backdrop-filter/ */
+  backdrop-filter: brightness(0.8);
+}

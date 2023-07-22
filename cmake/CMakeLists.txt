@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.18)
+project(myproject)
+add_subdirectory("a/aa")
+add_subdirectory("b/bb")
+add_subdirectory("c/cc")
+add_subdirectory("lib")

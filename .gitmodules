@@ -1,0 +1,6 @@
+[submodule "submodules/tinyproxy"]
+	path = submodules/tinyproxy
+	url = https://github.com/tinyproxy/tinyproxy.git
+[submodule "submodules/p5-ssl-tools"]
+	path = submodules/p5-ssl-tools
+	url = https://github.com/noxxi/p5-ssl-tools.git

@@ -1,0 +1,3 @@
+/home/r/playground/cmake/b/bb/_/CMakeFiles/rebuild_cache.dir
+/home/r/playground/cmake/b/bb/_/CMakeFiles/edit_cache.dir
+/home/r/playground/cmake/b/bb/_/CMakeFiles/bbb.dir

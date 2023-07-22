@@ -1,0 +1,5 @@
+---
+- ansible.builtin.setup:
+- ansible.builtin.include_tasks: include.yml
+  vars:
+    aa: 123

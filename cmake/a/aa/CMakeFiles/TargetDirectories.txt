@@ -1,0 +1,3 @@
+/home/r/playground/cmake/a/aa/CMakeFiles/rebuild_cache.dir
+/home/r/playground/cmake/a/aa/CMakeFiles/edit_cache.dir
+/home/r/playground/cmake/a/aa/CMakeFiles/aaa.dir

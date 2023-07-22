@@ -1,0 +1,24 @@
+.userPhoto {
+  width: 25px;
+  height: 25px;
+}
+.page {
+  cursor: pointer;
+}
+.page:hover {
+  background-color: cyan;
+}
+.selectedPage {
+  background-color: cyan;
+}
+.pagination {
+  font-size: x-small;
+  display: flex;
+  flex-wrap: wrap;
+}
+.odd {
+  background-color: darkgray;
+}
+.even {
+  background-color: lightgrey;
+}

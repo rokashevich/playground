@@ -1,0 +1,9 @@
+---
+- name: upgrade alpine
+  #hosts: local
+  hosts: lenovo
+  #hosts: 192.168.1.110
+
+  roles:
+    - {role: upgrade,tags: [x,y]}
+#   - upgrade

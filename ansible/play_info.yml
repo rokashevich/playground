@@ -1,0 +1,75 @@
+---
+- name: Info about everything
+
+  hosts: all
+  #hosts: local
+  #hosts: lenovo
+  #hosts: 192.168.1.110
+
+  vars:
+    ansible_user: root
+
+  gather_facts: true # чтобы была доступна ansible_facts
+  vars:
+    file_contents: "{{ lookup('file', '/tmp/a') }}"
+  tasks:
+    - debug: msg=">>{{file_contents}}<<"
+    # - shell: echo {{inventory_hostname}}
+    #   delegate_to: 127.0.0.1
+    #   register: xxx
+    # - debug: msg=">>{{hostvars['192.168.1.110']}}<<"
+
+
+
+    #- ansible.builtin.stat:
+    #    path: /etc/passwd
+    #  register: xxx
+    #- debug: msg=">>{{xxx}}<<"
+    #ok: [192.168.1.110] => {
+    #"msg": ">>{'changed': False,
+    #'stat': {'exists': True, 'path': '/etc/passwd', 'mode': '0644', 'isdir': False, 'ischr': False,
+    #'isblk': False, 'isreg': True, 'isfifo': False, 'islnk': False, 'issock': False, 'uid': 0,
+    #'gid': 0, 'size': 1223, 'inode': 5098, 'dev': 2051, 'nlink': 1, 'atime': 1661530809.38,
+    #'mtime': 1657958644.5391262, 'ctime': 1657958644.5391262, 'wusr': True, 'rusr': True, '
+    #xusr': False, 'wgrp': False, 'rgrp': True, 'xgrp': False, 'woth': False, 'roth': True,
+    #'xoth': False, 'isuid': False, 'isgid': False, 'blocks': 8, 'block_size': 4096,
+    #'device_type': 0, 'readable': True, 'writeable': True, 'executable': False, 'pw_name': 'root',
+    #'gr_name': 'root', 'checksum': '4f7412837aaf6ceb6db7bfbab2e50f7aea174966', 'mimetype': 'unknown',
+    # 'charset': 'unknown', 'version': None, 'attributes': [], 'attr_flags': ''}, 'failed': False}<<"
+    #}
+
+
+
+    # - shell: echo {{inventory_hostname}}
+    #   delegate_to: 127.0.0.1
+    #   register: xxx
+    # - debug: msg=">>{{xxx}}<<"
+    #ok: [192.168.1.110] => {
+    #    "msg": ">>{'changed': True, 'stdout': '192.168.1.110', 'stderr': '',
+    #               'rc': 0, 'cmd': 'echo 192.168.1.110', 'start': '2022-08-26 22:07:51.499167',
+    #                'end': '2022-08-26 22:07:51.502798', 'delta': '0:00:00.003631', 'msg': '',
+    #                'stdout_lines': ['192.168.1.110'], 'stderr_lines': [], 'failed': False}<<"
+    #}
+
+
+#    - debug:
+#        msg: "{{PATH}}"
+#        msg: "{{ansible_facts.mounts[0].mount}}" # кавычки нужны
+
+    # переводим строку "alpine-dhcp-110" в "110"
+#    - set_fact: my_var={{ansible_facts.hostname.split('-')[-1]}}
+#
+#    - debug: var=my_var # и запоминаем в переменную
+#      tags: [a,b,c]
+#
+#    - shell: hostname
+#      register: my_hostname
+#
+#    - debug: msg="Чётный {{my_hostname.stdout}}"
+#      when: (my_var|int)%2 == 0
+#
+#    - block: # можно и блок в блоке
+#      - debug: msg="Нечётный {{my_hostname.stdout}}"
+#      when: (my_var|int)%2 == 1
+#
+#    - debug: msg={{hostvars['192.168.1.111']}}

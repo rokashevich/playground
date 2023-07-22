@@ -1,0 +1,49 @@
+a1:~# lsmod 
+Module                  Size  Used by    Tainted: G  
+qrtr                   28672  2 
+ipv6                  458752 26 [permanent]
+venus_dec              28672  0 
+venus_enc              32768  0 
+videobuf2_dma_contig    20480  2 venus_dec,venus_enc
+videobuf2_memops       16384  1 videobuf2_dma_contig
+snd_soc_msm8916_digital    57344  0 
+snd_soc_apq8016_sbc    16384  0 
+snd_soc_qcom_common    16384  1 snd_soc_apq8016_sbc
+leds_aw2013            16384  0 
+qcom_rng               16384  0 
+crct10dif_ce           16384  1 
+qcom_fg                20480  0 
+venus_core            131072  2 venus_dec,venus_enc
+v4l2_mem2mem           36864  3 venus_dec,venus_enc,venus_core
+qcom_spmi_vadc         28672  0 
+qcom_spmi_temp_alarm    16384  0 
+qcom_pon               16384  0 
+panel_mdss_ili7807_fhd    16384  0 
+qcom_vadc_common       16384  1 qcom_spmi_vadc
+rtc_pm8xxx             16384  1 
+videobuf2_v4l2         32768  3 venus_dec,venus_enc,v4l2_mem2mem
+reboot_mode            16384  1 qcom_pon
+videobuf2_common       57344  7 venus_dec,venus_enc,videobuf2_dma_contig,videobuf2_memops,venus_core,v4l2_mem2mem,videobuf2_v4l2
+videodev              233472  6 venus_dec,venus_enc,venus_core,v4l2_mem2mem,videobuf2_v4l2,videobuf2_common
+mc                     57344  4 v4l2_mem2mem,videobuf2_v4l2,videobuf2_common,videodev
+bmi160_i2c             16384  0 
+bmi160_core            20480  1 bmi160_i2c
+industrialio_triggered_buffer    16384  1 bmi160_core
+kfifo_buf              16384  1 industrialio_triggered_buffer
+rmtfs_mem              16384  0 
+socinfo                20480  0 
+msm                   700416  1 
+gpu_sched              36864  1 msm
+mdt_loader             16384  2 venus_core,msm
+drm_display_helper    135168  1 msm
+drm_kms_helper        184320  2 msm,drm_display_helper
+drm                   512000  6 panel_mdss_ili7807_fhd,msm,gpu_sched,drm_display_helper,drm_kms_helper
+drm_panel_orientation_quirks    16384  1 drm
+cfbcopyarea            16384  1 drm_kms_helper
+fb_sys_fops            16384  1 drm_kms_helper
+sysimgblt              16384  1 drm_kms_helper
+sysfillrect            16384  1 drm_kms_helper
+cfbimgblt              16384  1 drm_kms_helper
+syscopyarea            16384  1 drm_kms_helper
+cfbfillrect            16384  1 drm_kms_helper
+edt_ft5x06             28672  0 

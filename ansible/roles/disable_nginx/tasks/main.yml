@@ -1,0 +1,5 @@
+---
+#https://docs.ansible.com/ansible/latest/collections/community/general/apk_module.html
+- community.general.apk:
+    available: yes
+    upgrade: yes

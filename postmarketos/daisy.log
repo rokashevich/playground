@@ -1,0 +1,95 @@
+a1:~# lsmod 
+Module                  Size  Used by    Tainted: G  
+wcn36xx                98304  0 
+mac80211              548864  1 wcn36xx
+libarc4                16384  1 mac80211
+btqcomsmd              16384  0 
+btqca                  20480  1 btqcomsmd
+bluetooth             524288  3 btqcomsmd,btqca
+cfg80211              380928  2 wcn36xx,mac80211
+ecdh_generic           16384  1 bluetooth
+ecc                    36864  1 ecdh_generic
+rfkill                 32768  3 bluetooth,cfg80211
+uinput                 24576  0 
+nft_reject_inet        16384  1 
+nf_reject_ipv4         16384  1 nft_reject_inet
+nf_reject_ipv6         20480  1 nft_reject_inet
+nft_reject             16384  1 nft_reject_inet
+nft_ct                 20480  3 
+nf_conntrack          126976  1 nft_ct
+nf_defrag_ipv4         16384  1 nf_conntrack
+nf_defrag_ipv6         20480  1 nf_conntrack
+wcnss_ctrl             16384  2 wcn36xx,btqcomsmd
+q6asm_dai              28672  0 
+ipv6                  458752 27 nf_reject_ipv6,[permanent]
+q6routing             389120  1 q6asm_dai
+q6voice_dai            16384  0 
+q6afe_dai              81920  0 
+q6afe_clocks           16384  1 
+q6voice                16384  1 q6voice_dai
+q6adm                  20480  1 q6routing
+q6asm                  28672  1 q6asm_dai
+q6afe                  24576  3 q6afe_dai,q6afe_clocks,q6adm
+q6cvp                  16384  1 q6voice
+q6cvs                  16384  0 
+q6mvm                  16384  1 q6voice
+snd_q6dsp_common       49152  4 q6afe_dai,q6afe_clocks,q6adm,q6asm
+q6voice_common         16384  4 q6voice,q6cvp,q6cvs,q6mvm
+q6core                 16384  3 q6adm,q6asm,q6afe
+apr                    20480  8 q6adm,q6asm,q6afe,q6cvp,q6cvs,q6mvm,q6voice_common,q6core
+pdr_interface          20480  1 apr
+qrtr_smd               16384  0 
+venus_enc              32768  0 
+venus_dec              28672  0 
+videobuf2_dma_contig    20480  2 venus_dec,venus_enc
+videobuf2_memops       16384  1 videobuf2_dma_contig
+crct10dif_ce           16384  1 
+msm                   700416  0 
+snd_soc_apq8016_sbc    16384  0 
+snd_soc_qcom_common    16384  1 snd_soc_apq8016_sbc
+goodix_ts              28672  0 
+snd_soc_msm8916_digital    57344  0 
+qcom_rng               16384  0 
+qcom_q6v5_pas          24576  0 
+qrtr                   28672 17 qrtr_smd
+qcom_wcnss_pil         20480  0 
+gpu_sched              36864  1 msm
+drm_display_helper    135168  1 msm
+drm_kms_helper        184320  2 msm,drm_display_helper
+qcom_q6v5_mss          32768  0 
+venus_core            131072  2 venus_enc,venus_dec
+qcom_smbchg            24576  0 
+qcom_spmi_vadc         28672  0 
+qcom_pon               16384  0 
+qcom_q6v5              16384  2 qcom_q6v5_pas,qcom_q6v5_mss
+v4l2_mem2mem           36864  3 venus_enc,venus_dec,venus_core
+pmic_sec_write         16384  1 qcom_smbchg
+qcom_spmi_temp_alarm    16384  0 
+qcom_common            16384  3 qcom_q6v5_pas,qcom_wcnss_pil,qcom_q6v5_mss
+reboot_mode            16384  1 qcom_pon
+qcom_vadc_common       16384  1 qcom_spmi_vadc
+rtc_pm8xxx             16384  1 
+qcom_fg                20480  0 
+videobuf2_v4l2         32768  3 venus_enc,venus_dec,v4l2_mem2mem
+qcom_sysmon            16384  4 qcom_q6v5_pas,qcom_wcnss_pil,qcom_q6v5_mss,qcom_q6v5
+drm                   512000  4 msm,gpu_sched,drm_display_helper,drm_kms_helper
+qmi_helpers            28672  2 pdr_interface,qcom_sysmon
+qcom_pil_info          16384  3 qcom_q6v5_pas,qcom_wcnss_pil,qcom_q6v5_mss
+videobuf2_common       57344  7 venus_dec,venus_enc,videobuf2_dma_contig,videobuf2_memops,venus_core,v4l2_mem2mem,videobuf2_v4l2
+mdt_loader             16384  5 msm,qcom_q6v5_pas,qcom_wcnss_pil,qcom_q6v5_mss,venus_core
+videodev              233472  6 venus_enc,venus_dec,venus_core,v4l2_mem2mem,videobuf2_v4l2,videobuf2_common
+drm_panel_orientation_quirks    16384  1 drm
+cfbcopyarea            16384  1 drm_kms_helper
+fb_sys_fops            16384  1 drm_kms_helper
+sysimgblt              16384  1 drm_kms_helper
+sysfillrect            16384  1 drm_kms_helper
+cfbimgblt              16384  1 drm_kms_helper
+st_lsm6dsx_i2c         20480  0 
+syscopyarea            16384  1 drm_kms_helper
+mc                     57344  4 v4l2_mem2mem,videobuf2_v4l2,videobuf2_common,videodev
+cfbfillrect            16384  1 drm_kms_helper
+st_lsm6dsx             45056  1 st_lsm6dsx_i2c
+kfifo_buf              16384  1 st_lsm6dsx
+socinfo                20480  0 
+rmtfs_mem              16384  2 
+edt_ft5x06             28672  0 
