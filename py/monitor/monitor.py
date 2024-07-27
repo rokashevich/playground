@@ -5,10 +5,30 @@ import os
 import shlex
 import sys
 
+
+
 # print(f"\033[31m red\033[0m")
 # print(f"\033[32m green\033[0m")
 # print(f"\033[33m yellow\033[0m")
 
+
+
+
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
+import json
+class RequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == "/metrics":
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+
+            # Retrieve shared data
+            self.wfile.write(json.dumps({"a":1}).encode())
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
 
 @dataclass
 class App:
@@ -56,6 +76,8 @@ async def run_app(app):
 
 
 async def main(apps):
+    httpd = ThreadedHTTPServer(('', 8000), RequestHandler)
+    loop = asyncio.get_event_loop().run_in_executor(None, httpd.serve_forever)
     while True:
         # if os.path.exists("/tmp/a"):
         #     apps["./script2.py"].enabled = False
