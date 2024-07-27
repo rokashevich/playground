@@ -12,12 +12,25 @@ import sys
 # print(f"\033[33m yellow\033[0m")
 
 
+queue = asyncio.Queue()
 
+
+async def printer():
+    print(queue)
+    while True:
+        message = await queue.get()
+        if message is None:  # Exit condition
+            break
+        print("!!!!!!!"+message)
+        queue.task_done()
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 import json
 class RequestHandler(BaseHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        self.loop = kwargs.pop('loop')
+        super().__init__(*args, **kwargs)
     def do_GET(self):
         if self.path == "/metrics":
             self.send_response(200)
@@ -28,7 +41,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"a":1}).encode())
     def log_message(self, format, *args):
         # Customize log message format here
-        print(f">>>>>>{self.client_address[0]} - - [{self.log_date_time_string()}] {format % args}")
+        print("log_message")
+        message = f">>>>>>{self.client_address[0]} - - [{self.log_date_time_string()}] {format % args}"
+        asyncio.run_coroutine_threadsafe(queue.put(message), self.loop)
+        print(queue)
 
     # def log(self, message):
     #     # Output the log message to a specific destination or format it differently
@@ -83,8 +99,12 @@ async def run_app(app):
 
 
 async def main(apps):
-    httpd = ThreadedHTTPServer(('', 8000), RequestHandler)
-    loop = asyncio.get_event_loop().run_in_executor(None, httpd.serve_forever)
+    loop = asyncio.get_event_loop()
+    httpd = ThreadedHTTPServer(('', 8000), lambda *args, **kwargs: RequestHandler(*args, loop=loop, **kwargs))
+    loop.run_in_executor(None, httpd.serve_forever)
+    consumer_task = asyncio.create_task(printer())
+
+
     while True:
         # if os.path.exists("/tmp/a"):
         #     apps["./script2.py"].enabled = False
