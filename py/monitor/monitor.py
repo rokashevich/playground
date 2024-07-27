@@ -26,6 +26,13 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             # Retrieve shared data
             self.wfile.write(json.dumps({"a":1}).encode())
+    def log_message(self, format, *args):
+        # Customize log message format here
+        print(f">>>>>>{self.client_address[0]} - - [{self.log_date_time_string()}] {format % args}")
+
+    # def log(self, message):
+    #     # Output the log message to a specific destination or format it differently
+    #     print(f"Custom Log: {message}")
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
