@@ -89,10 +89,10 @@ async def run_app(app):
                 line = await stream.readline()
                 if not line:
                     break
-                callback(line.decode().strip())
+                await callback(line.decode().strip())
 
-        app.stdout_task = asyncio.create_task(read_stream(app.process.stdout, lambda line: print(f"[{app.name} stdout] {line}")))
-        app.stderr_task = asyncio.create_task(read_stream(app.process.stderr, lambda line: print(f"[{app.name} stderr] {line}")))
+        app.stdout_task = asyncio.create_task(read_stream(app.process.stdout, lambda line: queue.put(f"[{app.name} stdout] {line}")))
+        app.stderr_task = asyncio.create_task(read_stream(app.process.stderr, lambda line: queue.put(f"[{app.name} stderr] {line}")))
 
         await asyncio.wait([app.stdout_task, app.stderr_task])
         await app.process.wait()
