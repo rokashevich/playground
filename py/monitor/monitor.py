@@ -4,12 +4,103 @@ from dataclasses import dataclass
 import os
 import shlex
 import sys
+import psycopg2
+from psycopg2 import sql
+import time
 
 
+host = "HHH"
+database = "monitordb"
+user = "YYY"
+password = "XXX"
+schema = "monitor"
+def perform_database_operations():
+    try:
+        # Connect to the PostgreSQL database
+        conn = psycopg2.connect(
+            host=host,
+            database=database,
+            user=user,
+            password=password
+        )
+        cur = conn.cursor()
 
-# print(f"\033[31m red\033[0m")
-# print(f"\033[32m green\033[0m")
-# print(f"\033[33m yellow\033[0m")
+        # 1. Check if the table "monitor" exists and create it if not
+        create_table_query = sql.SQL("""
+        CREATE TABLE IF NOT EXISTS {schema}.{table} (
+            string TEXT,
+            time TIMESTAMP,
+            int INTEGER,
+            bool BOOLEAN
+        )
+        """).format(schema=sql.Identifier(schema), table=sql.Identifier("monitor"))
+
+        cur.execute(create_table_query)
+        conn.commit()
+
+        # 2. Check if a row with the specified string value exists
+        string_value = "name n"
+        check_query = sql.SQL("""
+        SELECT EXISTS (
+            SELECT 1 FROM {schema}.{table} WHERE string = %s
+        )
+        """).format(schema=sql.Identifier(schema), table=sql.Identifier("monitor"))
+
+        cur.execute(check_query, (string_value,))
+        exists = cur.fetchone()[0]
+
+        if not exists:
+            # 3. Insert the initial row if it does not exist
+            insert_query = sql.SQL("""
+            INSERT INTO {schema}.{table} (string, time, int, bool)
+            VALUES (%s, %s, %s, %s)
+            """).format(schema=sql.Identifier(schema), table=sql.Identifier("monitor"))
+
+            # Example values for the initial insert
+            initial_time = '2024-07-29 12:00:00'  # Replace with the actual initial time if needed
+            initial_int = 0
+            initial_bool = False
+
+            cur.execute(insert_query, (string_value, initial_time, initial_int, initial_bool))
+            conn.commit()
+        else:
+            # 2. Update the table where string == 'name n'
+            update_query = sql.SQL("""
+            UPDATE {schema}.{table}
+            SET time = CURRENT_TIMESTAMP, int = %s, bool = %s
+            WHERE string = %s
+            """).format(schema=sql.Identifier(schema), table=sql.Identifier("monitor"))
+
+            # Example values for int and bool
+            int_value = 42
+            bool_value = True
+            string_value = "name n"
+
+            cur.execute(update_query, (int_value, bool_value, string_value))
+            conn.commit()
+
+        # 3. Retrieve all rows from the table
+        select_query = sql.SQL("""
+        SELECT * FROM {schema}.{table}
+        """).format(schema=sql.Identifier(schema), table=sql.Identifier("monitor"))
+
+        cur.execute(select_query)
+        rows = cur.fetchall()
+
+        # Print the rows or process them as needed
+        for row in rows:
+            print(row)
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        # Ensure the cursor and connection are closed
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
 
 
 queue = asyncio.Queue()
@@ -106,12 +197,11 @@ async def main(apps):
 
 
     while True:
-        # if os.path.exists("/tmp/a"):
-        #     apps["./script2.py"].enabled = False
-        #     apps["./script2.py"].task.cancel()
-        #     apps["./script2.py"].process = None
-        # else:
-        #     apps["./script2.py"].enabled = True
+        await queue.put("xxx")
+
+
+
+        perform_database_operations()
 
         for app in apps:
             if app.enabled and not app.process:
